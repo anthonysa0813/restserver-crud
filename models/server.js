@@ -1,8 +1,5 @@
-// import cors from "cors";
 const cors = require("cors");
-// import express from "express";
 const express = require("express");
-// import { this.app as userRoutes } from "../routes/users.js";
 
 class Server {
   constructor() {
