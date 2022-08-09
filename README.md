@@ -436,7 +436,7 @@ const userGet = async (req = request, res = response) => {
 };
 ```
 
-- refactorizando el código
+- refactorizando el Código
 
 ```js
 const userGet = async (req = request, res = response) => {
