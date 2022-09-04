@@ -427,7 +427,7 @@ const userGet = async (req = request, res = response) => {
   const usuarios = await Usuario.find({ state: false })
     .limit(Number(limit))
     .skip(Number(from));
-  const total = await Usuario.countDocuments({ state: false }); // aqui debería ser true
+  const total = await Usuario.countDocuments({ state: false }); // aqui debería ser true por un filtrado, es opcional
 
   res.json({
     total,
@@ -469,5 +469,51 @@ const userDelete = async (req, res) => {
   res.json({
     message: `delete user with id: ${id}`,
   });
+};
+```
+
+## 20. Update User
+
+```js
+// controller/user.js
+
+export const userPut = async (req = request, res) => {
+  const { id } = req.params;
+  const { _id, password, google, ...resto } = req.body;
+
+  if (password) {
+    const salt = await bcrypt.genSaltSync();
+    resto.password = await bcrypt.hashSync(password, salt);
+  }
+
+  const user = await User.findByIdAndUpdate(id, resto);
+  await user.save();
+
+  res.json({
+    message: "Put user",
+    ...resto,
+  });
+};
+
+// Validation in the route
+// routes/user.js
+router.put(
+  "/:id",
+  [
+    check("id", "Is invalid the id").isMongoId(),
+    check("id", "don't exist user with this id").custom((id) =>
+      existUserById(id)
+    ),
+    validationField,
+  ],
+  userPut
+);
+
+// helper para la custom existUserById
+export const existUserById = async (id) => {
+  const existUser = await User.findById(id);
+  if (!existUser) {
+    throw new Error("the user does not exist");
+  }
 };
 ```
